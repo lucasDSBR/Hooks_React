@@ -1,41 +1,89 @@
 /* eslint-disable*/
-import { useDebugValue, useEffect, useState } from 'react';
+import { Component, useEffect, useState } from 'react';
 
-const useMediaQuery = (queryValue, initialValue = false) => {
-  const [match, setMatch] = useState(initialValue);
+const s = {
+  style: {
+    fontSize: '60px',
+  },
+};
 
-  useDebugValue(`Query: ${queryValue}`, (name) => {
-    return name + ' modificado';
-  });
+class MyErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Atualiza o state para que a próxima renderização mostre a UI alternativa.
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Você também pode registrar o erro em um serviço de relatórios de erro
+    // console.log(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Você pode renderizar qualquer UI alternativa
+      return <p {...s}>Deu ruim =(</p>;
+    }
+
+    return this.props.children;
+  }
+}
+
+const ItWillThrowError = () => {
+  const [counter, setCounter] = useState(0);
 
   useEffect(() => {
-    let isMounted = true;
-    const matchMedia = window.matchMedia(queryValue);
+    if (counter > 3) {
+      throw new Error('Que chato!!!');
+    }
+  }, [counter]);
 
-    const handleChange = () => {
-      if (!isMounted) return;
-      setMatch(Boolean(matchMedia.matches));
-    };
-
-    matchMedia.addEventListener('change', handleChange);
-    setMatch(!!matchMedia.matches);
-
-    return () => {
-      isMounted = false;
-      matchMedia.removeEventListener('change', handleChange);
-    };
-  }, [queryValue]);
-
-  return match;
+  return (
+    <div>
+      <button {...s} onClick={() => setCounter((s) => s + 1)}>
+        Click to increase {counter}
+      </button>
+    </div>
+  );
 };
 
 export const Home = () => {
-  const huge = useMediaQuery('(min-width: 980px)');
-  const big = useMediaQuery('(max-width: 979px) and (min-width: 768px)');
-  const medium = useMediaQuery('(max-width: 767px) and (min-width: 321px)');
-  const small = useMediaQuery('(max-width: 321px)');
-
-  const background = huge ? 'green' : big ? 'red' : medium ? 'yellow' : small ? 'purple' : null;
-
-  return <div style={{ fontSize: '60px', background }}>Oi</div>;
+  return (
+    <div {...s}>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+      <MyErrorBoundary>
+        <ItWillThrowError />
+      </MyErrorBoundary>
+    </div>
+  );
 };
